@@ -1,0 +1,31 @@
+[package]
+name = "orbit-bot"
+version = "0.2.0"
+edition = "2024"
+
+[dependencies]
+poise = "0.6"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "multipart", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std", "serde"] }
+chrono-tz = "0.10"
+anyhow = "1"
+dotenvy = "0.15"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+axum = "0.8"
+
+# Optimize the release build.
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+
+# Serenity 0.12.5 drops the values of Label components (modal dropdowns).
+# vendor/serenity is 0.12.5 with one small patch; see vendor/README.md.
+[patch.crates-io]
+serenity = { path = "vendor/serenity" }

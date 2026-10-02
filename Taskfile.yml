@@ -1,0 +1,82 @@
+# Task runner for the orbit-bot Discord bot. https://taskfile.dev
+# Run `task` (or `task --list`) to see the available tasks.
+version: '3'
+
+# Load .env so DISCORD_TOKEN, ALLOWED_USER_IDS, and ORBIT_* are available to every task.
+# A missing .env file is ignored (run `task setup` to create one).
+dotenv: ['.env']
+
+tasks:
+  default:
+    desc: List the available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  setup:
+    desc: Create .env from .env.example (only if it is missing)
+    cmds:
+      - cp .env.example .env
+      - 'echo "Created .env — edit it and set DISCORD_TOKEN."'
+    status:
+      - test -f .env
+
+  dev:
+    desc: Run the bot (debug build)
+    cmds:
+      - cargo run
+    preconditions:
+      - sh: test -f .env
+        msg: 'No .env found. Run "task setup", then edit .env to set DISCORD_TOKEN.'
+
+  start:
+    desc: Run the bot (release build)
+    cmds:
+      - cargo run --release
+    preconditions:
+      - sh: test -f .env
+        msg: 'No .env found. Run "task setup", then edit .env to set DISCORD_TOKEN.'
+
+  check-orbit:
+    desc: Sign in to Orbit and show what the bot can see (no Discord)
+    cmds:
+      - cargo run -q -- check
+    preconditions:
+      - sh: test -f .env
+        msg: 'No .env found. Run "task setup", then edit .env.'
+
+  test:
+    desc: Run the tests
+    cmds:
+      - cargo test
+
+  build:
+    desc: Compile (debug)
+    cmds:
+      - cargo build
+
+  release:
+    desc: Compile (release)
+    cmds:
+      - cargo build --release
+
+  fmt:
+    desc: Format the code
+    cmds:
+      - cargo fmt
+
+  lint:
+    desc: Run clippy
+    cmds:
+      - cargo clippy --all-targets
+
+  check:
+    desc: Check formatting and run clippy
+    cmds:
+      - cargo fmt --check
+      - cargo clippy --all-targets
+
+  clean:
+    desc: Remove build artifacts
+    cmds:
+      - cargo clean
